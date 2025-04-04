@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Agendamentos - ChoferFred</title>
+</head>
+<body>
+<h1>
+    Agendamentos em Rondonópolis</h1>
+
+<div th:if="${agendamento}">
+    <p><strong>Origem:</strong> <span th:text="${agendamento.origem}"></span></p>
+    <p><strong>Destino:</strong> <span th:text="${agendamento.destino}"></span></p>
+    <img th:src="${agendamento.mapaUrl}" alt="Mapa da Rota">
+</div>
+</body>
+</html>

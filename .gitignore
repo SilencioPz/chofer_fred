@@ -1,0 +1,62 @@
+Arquivos que serão ignorados com o .gitignore - sempre é gerado pelo IntelliJ, basta colocar esta base:
+
+# --- Arquivos compilados do Java ---
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.log
+
+# --- Diretórios de build e dependências ---
+/target/
+/build/
+/out/
+/bin/
+*.iml
+
+# --- IDE (IntelliJ/Android Studio) ---
+.idea/
+*.ipr
+*.iws
+*.iml
+*.ids
+*.orig
+*.swp
+*.swo
+*~
+
+# --- Sistema operacional (Linux/Mac) ---
+.DS_Store          # Mac
+.Trashes           # Mac
+Thumbs.db          # Windows
+ehthumbs.db        # Windows
+
+# --- Maven/Gradle ---
+.gradle/
+.mvn/
+mvnw
+mvnw.cmd
+gradlew
+gradlew.bat
+dependency-reduced-pom.xml
+
+# --- Logs e temp files ---
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+/nbproject/private/
+/var/
+/tmp/
+
+# --- Arquivos de configuração sensíveis ---
+*.json
+!pom.json  # Exceto esse se existir
+src/main/resources/*.json
+!src/main/resources/application*.json  # Permite apenas application.properties/application.yml
+
+# --- VSCode (caso use) ---
+.vscode/
+.settings/

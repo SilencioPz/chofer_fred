@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚗Chofer Fred - Agendamento de Caronas🚗</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="icon" th:href="@{/images/silenciopz-logo-150.ico}" type="image/x-icon">
+    <style>
+        .map-container {
+            height: 400px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .map-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .logo-left {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        height: 80px;
+        }
+        .logo-right {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        height: 80px;
+        }
+        .input-group-text {
+            cursor: pointer;
+            background-color: #e9ecef;
+            transition: background-color 0.3s;
+        }
+        .input-group-text:hover {
+            background-color: #dee2e6;
+        }
+        input::placeholder {
+            color: #6c757d;
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+        .text-muted {
+            font-size: 0.8em;
+            display: block;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <!-- Imagem no canto superior esquerdo -->
+    <img th:src="@{/images/chofer-fred.png}" alt="Chofer Fred" class="logo-left">
+
+    <!-- Imagem no canto superior direito -->
+    <img th:src="@{/images/silenciopz-logo-150.png}" alt="SilencioPZ Logo" class="logo-right">
+</div>
+
+<div class="container mt-5">
+    <!-- Mensagens de status -->
+    <div th:if="${error != null}" class="alert alert-danger" th:text="${error}"></div>
+    <div th:if="${success != null}" class="alert alert-success" th:text="${success}"></div>
+
+    <h1 class="text-center mb-4">🚗Agendamento de Caronas🚗</h1>
+
+    <!-- Formulário de Agendamento -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form th:action="@{/agendar}" method="post" th:object="${agendamentoDTO}">
+                <h4 class="mb-3">Informações da Viagem</h4>
+
+                <div class="mb-3">
+                    <label for="origem" class="form-label">Origem:</label>
+                    <input type="text" class="form-control" id="origem" th:field="*{origem}"
+                           placeholder="Ex: Rua Otávio Pitaluga, 1, Rondonópolis"
+                           title="Digite o endereço de partida (Rua, Número, Cidade)" required>
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="destino" class="form-label">Destino:</label>
+                    <input type="text" class="form-control" id="destino" th:field="*{destino}"
+                           placeholder="Ex: Avenida Rio Branco, 2, Rondonópolis"
+                           title="Digite o endereço de destino (Rua, Número, Cidade)" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="dataHora" class="form-label">Data e Hora:</label>
+                    <div class="input-group">
+                        <input type="datetime-local" class="form-control" id="dataHora" th:field="*{dataHora}" required>
+                        <span class="input-group-text" id="calendarioIcon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-calendar"
+                                 viewBox="0 0 16 16">
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <small class="text-muted">Clique no ícone do calendário para selecionar</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="valor" class="form-label">Valor (R$):</label>
+                    <input type="number" step="0.01" class="form-control" id="valor" th:field="*{valor}" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Agendar Carona</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mapa e Detalhes da Rota (após submissão) -->
+    <div th:if="${agendamentoDTO != null and agendamentoDTO.rota != null}">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5>Rota Calculada</h5>
+            </div>
+            <div class="card-body">
+                <!-- Mapa -->
+                <div th:if="${agendamentoDTO.mapaUrl != null}">
+                    <iframe th:src="${agendamentoDTO.mapaUrl}" width="600" height="450" style="border:0;"></iframe>
+                </div>
+            </div>
+
+            <!-- Detalhes da Rota -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <h6>Informações da Viagem</h6>
+                    <p><strong>Origem:</strong> <span th:text="${agendamentoDTO.origem}"></span></p>
+                    <p><strong>Destino:</strong> <span th:text="${agendamentoDTO.destino}"></span></p>
+                    <p><strong>Data/Hora:</strong>
+                        <span th:if="${agendamentoDTO.rota != null}"></span>
+                    </p>
+                    <p><strong>Distância:</strong> <span th:text="${agendamentoDTO.rota.distancia} + ' km'"></span></p>
+                    <p><strong>Duração:</strong> <span th:text="${agendamentoDTO.rota.duracao} + ' minutos'"></span></p>
+                    <p><strong>Valor:</strong> R$
+                        <span th:text="${agendamentoDTO.valor != null} ?
+                                  ${#numbers.formatDecimal(agendamentoDTO.valor, 1, 2)} :
+                                  '0,00'"></span>
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <h6>Passos da Rota</h6>
+                    <ul th:if="${agendamentoDTO.rota.passos != null and !agendamentoDTO.rota.passos.isEmpty()}">
+                        <li th:each="passo : ${agendamentoDTO.rota.passos}" th:text="${passo}"></li>
+                    </ul>
+                    <p th:if="${agendamentoDTO.rota.passos == null or agendamentoDTO.rota.passos.isEmpty()}">
+                        Nenhuma informação detalhada da rota disponível.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Botão de Confirmação -->
+            <div class="mt-3 text-center">
+                <form th:action="@{/confirmacoes/agendamento}" method="post">
+
+                    <input type="hidden" th:name="origem" th:value="${agendamentoDTO.origem}">
+                    <input type="hidden" th:name="destino" th:value="${agendamentoDTO.destino}">
+                    <input type="hidden" th:name="dataHora" th:value="${agendamentoDTO.dataHora}">
+                    <input type="hidden" th:name="valor" th:value="${agendamentoDTO.valor}">
+                    <input type="hidden" th:name="tempoEstimado" th:value="${agendamentoDTO.tempoEstimado}">
+
+                    <button type="submit" class="btn btn-success">Confirmar Agendamento</button>
+                    <a th:href="@{/chofer}" class="btn btn-secondary ms-2">Voltar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('calendarioIcon').addEventListener('click', function() {
+            document.getElementById('dataHora').focus();
+            document.getElementById('dataHora').showPicker();
+        });
+
+        const formatarEndereco = (input) => {
+            input.addEventListener('blur', function() {
+                if (this.value && !this.value.includes(',')) {
+                    this.value += ', Rondonópolis';
+                }
+            });
+        };
+
+        formatarEndereco(document.getElementById('origem'));
+        formatarEndereco(document.getElementById('destino'));
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const formConfirmacao = document.querySelector('form[action*="confirmacoes/agendamento"]');
+
+        if (formConfirmacao) {
+            formConfirmacao.addEventListener('submit', function(e) {
+                const dataHoraInput = this.querySelector('input[name="dataHora"]');
+                if (dataHoraInput && dataHoraInput.value) {
+                    dataHoraInput.value = new Date(dataHoraInput.value).toISOString().slice(0, 16);
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>
